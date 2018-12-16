@@ -1,0 +1,27 @@
+* {
+  margin: 5px;
+}
+
+.error {
+  background-color: rgb(200, 10, 10);
+  width: 100vw;
+  height: 5vh;
+}
+.error a{
+  position: absolute;
+  float: left;
+  margin-left: 25px;
+  text-decoration: none;
+  color: white;
+  transition: all 0.5s;
+}
+
+.error a:hover{
+  color: black;
+}
+
+.error h1{
+  text-align: center;
+  margin: auto;
+  color: black;
+}
