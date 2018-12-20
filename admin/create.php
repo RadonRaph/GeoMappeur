@@ -22,7 +22,7 @@ $bdd = bdd();
  if (isset($_GET["e"]) || !empty($_GET["e"])){
    ?>
    <div class="error">
-     <a href="index.php"><h2>X</h2></a>
+     <a href="create.php"><h2>X</h2></a>
      <h1><?php echo($_GET['e']) ?></h1>
    </div>
    <?php
@@ -34,7 +34,7 @@ $bdd = bdd();
  </div>
 
 <div class="page">
-  <form action="create.php" method="post">
+  <form action="create.php" method="post" enctype="multipart/form-data">
     <h3>Nouvelle carte</h3>
     <br>
 
@@ -51,7 +51,7 @@ $bdd = bdd();
     <br>
 
     <label for="description">Courte description</label>
-    <textarea name="description" required></textarea>
+    <textarea name="description"></textarea>
     <br>
 
     <label for="autor">Auteur</label>
@@ -75,28 +75,48 @@ $bdd = bdd();
 
 <?php
 //Si il y a des données on les traites
-if (isset($_POST["submit"])){
 
-$data["name"] = htmlspecialchars($_POST["name"]);
-
-if (checkImg($_FILES['thumbnail']["tmp_name"]) == true){
-  $target_dir = "../uploads/thumbnails/";
-  $target_file = $target_dir . basename($_FILES["thumbnail"]["name"]);
-  move_uploaded_file($_FILES['thumbnail']["tmp_name"], $target_file);
-  $data["thumbnail"] = $target_file;
-}else{
-  header("Location: create.php?e=Thumbnail incorrect");
-}
-
-if (checkImg($_FILES['background']["tmp_name"]) == true){
-  $target_dir = "../uploads/background/";
-  $target_file = $target_dir . basename($_FILES["background"]["name"]);
-  move_uploaded_file($_FILES['background']["tmp_name"], $target_file);
-  $data["background"] = $target_file;
-}else{
-  header("Location: create.php?e=Fond de carte incorrect");
-}
+if (isset($_POST["name"])){
 
 
+  $data["name"] = htmlspecialchars($_POST["name"]);
 
+  if (checkImg($_FILES['thumbnail']["tmp_name"]) == true){
+    $target_dir = "../uploads/thumbnails/";
+    $target_file = $target_dir . basename($_FILES["thumbnail"]["name"]);
+    move_uploaded_file($_FILES['thumbnail']["tmp_name"], $target_file);
+    $data["thumbnail"] = $target_file;
+  }else{
+    //header("Location: create.php?e=Thumbnail incorrect");
+    echo "fail thumbnail";
+  }
+
+  if (checkImg($_FILES['background']["tmp_name"]) == true){
+    $target_dir = "../uploads/backgrounds/";
+    $target_file = $target_dir . basename($_FILES["background"]["name"]);
+    move_uploaded_file($_FILES['background']["tmp_name"], $target_file);
+    $data["background"] = $target_file;
+  }else{
+    //header("Location: create.php?e=Fond de carte incorrect");
+    echo "fail background";
+  }
+
+  if (isset($_POST['description']) && !empty($_POST['description'])){
+    $data["description"] = $_POST['description'];
+  }else{
+    $data["description"] = "";
+  }
+
+  $data["autor"] = $_POST['autor'];
+  $data["date"] = $_POST['date'];
+  $data["htmlcontent"] = $_POST['htmlcontent'];
+
+  try {
+      $sql = "INSERT INTO maps (name, thumbnail, background, description, autor, date, htmlcontent) VALUES (:name, :thumbnail, :background, :description, :autor, :date, :htmlcontent)";
+      $stmt= $bdd->prepare($sql);
+      $stmt->execute($data);
+  }catch (Exception $e) {
+      echo $e->getMessage();
+
+  }
 }
